@@ -1,0 +1,10 @@
+{% block menu %}
+<nav class="navbar navbar-expand-md">
+    <a class="navbar-brand" href="{% url 'articles:home' %}">ITBLOG</a>
+    <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+        <span class="navbar-togger-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="main-navigation"></div>
+    {% include 'main_menu.html' %}
+</nav>
+{% endblock menu %}

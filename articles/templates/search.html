@@ -1,0 +1,16 @@
+<form action="{% url 'articles:searchview' %}" method="post">
+    
+    {% csrf_token %}
+    <span>search</span>
+    <input type="text" name="text" id="">
+    <span>in</span>
+    <select name="select" id="">
+        <option value="comments">comments</option>
+        <option value="articles" selected>articles</option>
+        <option value="users">users</option>
+    </select>
+    
+    <button type="submit">go</button> 
+
+
+</form>

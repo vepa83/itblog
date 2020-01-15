@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block slider %}
+    
+{% endblock slider %}
+
+{% block search %}
+    
+{% endblock search %}
+    
+    
+{% block content %}
+    <form action="{% url 'articles:add_pic_view_2' article.id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        alt:<br>
+        <input type="text" name="alt"><br>
+        picture:<br>
+        <input type="file" name="picture"><br>
+        <input type="submit" value="add">
+    </form>
+{% endblock content %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    {{user.username}}
+{% endblock title %}
+{% block slider %}
+
+{% endblock slider %}
+
+{% block search %}
+
+{% endblock search %}
+
+
+{% block content %}
+    <br>
+    <a href="{% url 'articles:create_article' %}">create new article</a>
+    <h2>Your article list</h2>
+    
+    {% for article in articles %}
+        
+        {% if article.author_id == user.id %}
+            
+            {% if article.published %}
+                published 
+            {% else %}
+                pending
+            {% endif %}
+            <a href="{% url 'articles:detailview'  article.id %}"><strong>{{article.title}}</strong></a>
+            <a href="{% url 'articles:a_delete' article.id %}">delete</a><br>
+            <p>
+                {{article.text|truncatewords:4}}
+            </p>
+            <em>{{article.pub_date}}</em><br>
+        {% endif %}
+    
+    {% endfor %}
+   
+    <h2>Your comment list</h2>
+
+    {% for comment in comments %}
+    
+        {% if comment.author_id == user.id %}
+            <a href="{% url 'articles:detailview' comment.article.id %}"><strong>{{comment.text|safe}}</strong></a>
+            <a href="{% url 'comments:deletecomment' comment.id %}">delete</a><br>
+            <em>{{comment.pub_date}}</em><br>
+        {% endif %}
+            
+    {% endfor %}
+   
+{% endblock content %}
+    

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {{article.title}}
+{% endblock title %}
+    
+{% block slider %}
+
+{% endblock slider %}
+{% block content %}
+
+    {% if article.author.id == user.id %}
+    <a href="{% url 'articles:add_pic_view' article.id %}">add more pictures</a>
+    {% endif %}
+
+    {% if article.author.id == user.id %}
+    <div class="art_update_wrap">
+        <!--article update form-->    
+        <form class="art_update_form" action="{% url 'articles:a_update' article.id %}" method="post" enctype="multipart/form-data">
+            <input type="submit" name="submit" value="update" /> <br>
+            {% csrf_token %} <br>
+            
+            Change image: <br>
+            <input type="file" name="picture" id=""><br>
+            Change title: <br>
+            <input type="text" name="title" value="{{article.title}}" id=""><br>
+            Change text: <br>
+            <textarea name="text" id="" cols="30" rows="10">
+                {{article.text}}
+            </textarea>
+        </form>
+        <!--article update form end-->
+    </div>
+    {% endif %}
+        
+    <strong>{{article.title}}</strong><br>
+
+    {% if user.is_authenticated %}
+    <!--like  form -->
+    <form action="{% url 'articles:like' article.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value={{user.id}}>
+        <input type="submit" name="like" value="like"> 
+    </form>
+    <!--like form end -->
+    <strong>{{likes}}</strong>
+    {% else %}
+    <h4>You must be logged in to vote articles</h4>
+    <strong>Like</strong>
+    <strong>{{likes}}</strong>
+    {% endif %}
+    
+    {% if user.is_authenticated %}
+    <!--dislike form -->
+    <form action="{% url 'articles:dislike' article.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value={{user.id}}>
+        <input type="submit" name="dislike" value="dislike">
+    </form>
+    <!--dislike form end -->
+    <strong>{{dislikes}}</strong><br>
+    {% else %}
+    <strong>Disike</strong>
+    <strong>{{dislikes}}</strong><br>
+    {% endif %}
+
+    <!--image thumbnail and url to actual image-->
+    <a href="{{article.image.url}}" target="_blank">
+        <img src="{{article.thumbnail.url}}" alt="{{article.title}}">
+    </a>
+    <!--image thumbnail and url to actual image end-->
+    <!--Picture thumbnail and url to actual pictures-->
+    {% for picture in pictures %}
+        
+    <a href="{{picture.picture.url}}" target="_blank">
+        <img src="{{picture.thumbnail.url}}" alt="{{picture.alt}}">
+    </a>
+
+    {% endfor %}
+    <!--Picture thumbnail and url to actual pictures end-->
+    <div>
+        <p>
+            {{article.text|safe}}
+        </p>
+    </div>
+
+    <div>
+        Author: <strong>{{article.author.username}}</strong><br>
+        <em>published in {{article.pub_date}}</em>
+    </div>
+    <hr>
+    <br>
+<!--Comment section end -->
+<div id="comment_section">    
+    <!--leave comment section -->
+    <div>
+        
+        {% if user.is_authenticated %}
+            <form action="{% url 'comments:leavecomment' article.id %}" method="post">
+                <h3> leave your comment here</h3>
+                {% csrf_token %}
+                <input type="hidden" name="user" value="{{user.id}}" id="">
+                <textarea name="text" required>
+            
+                </textarea><br>
+                <input type="submit" name="submit" value="OK" />
+            </form>
+        {% else %}
+            <h4>You must be logged in to be able to leave comments</h4>        
+        {% endif %}
+            
+        
+    </div>
+    <!--leave comment section end-->
+
+    <!-- List of comments -->
+    <div>
+        
+        {% for comment in comments %}
+            <div>
+                <p>
+                    {{comment.text}}
+                </p>
+            </div>
+
+            <div>
+                <h5>{{comment.author.username}}</h5>
+            </div>
+            <hr>
+        {% empty %}
+            <h3>No comments be a first!</h3>
+        {% endfor %}
+            
+    </div>
+    <!-- List of comments end-->
+</div>
+<!--Comment section end -->
+{% endblock content %}
+    

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}
+search result
+{% endblock title %}
+
+{% block slider %}
+
+{% endblock slider %}
+
+{% block content %}
+   <h2>Search result</h2>
+<h3>{{matching}} matching found</h3>
+   {% if res is 1 %}
+    {% for article in searchresult %}
+        <a href="{% url 'articles:detailview' article.id %}">{{article.title}}</a>
+        <p>
+            {{article.text|truncatewords:5}}
+        </p>
+    {% empty %}
+        no matches
+    {% endfor %}
+
+   {% elif res is 2 %}
+    {% for comment in searchresult %}
+        {{comment.text}}
+    {% empty %}
+        no matches
+    {% endfor %}
+   
+   {% elif res is 3 %}
+    {% for usr in searchresult %}
+        {{usr.username}}
+    {% empty %}
+        no matches
+    {% endfor %}
+
+    {% else %}
+        {{select}}
+    
+   {% endif %}
+  
+{% endblock content %}

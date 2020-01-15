@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <form action="{% url 'articles:a_create' %}" method="post" enctype="multipart/form-data">
+        <h3> Create article</h3>
+        select category: <br>
+        <select name="select" id="">
+            {% for category in categories %}
+                <option value="{{category.id}}">{{category.name}}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" name="submit" value="create" /> <br>
+        {% csrf_token %} <br>
+        <input type="hidden" name="usr" value="{{user.id}}" id=""><br>
+        title: <br>
+        <input type="text" name="title" value="" id="" required><br>
+        image: <br>
+        <input type="file" name="image" value="" id=""><br>
+        text: <br>
+        <textarea name="text" id="" cols="30" rows="10" required></textarea>
+    </form>
+{% endblock content %}
