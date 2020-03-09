@@ -14,7 +14,7 @@ User = get_user_model()
 
 
 def homeview(request):
-    menu_item_list = Menu.objects.all()
+    menu_list = Menu.objects.all()
     sliders = Slider.objects.all()
     categories = Category.objects.all()
     articles = Article.objects.order_by('-pub_date').filter(published=True)[:10]
@@ -22,62 +22,60 @@ def homeview(request):
         'categories':categories,
         'articles':articles,
         'sliders':sliders,
-        'menu_item_list':menu_item_list,
+        'menu_list':menu_list,
     }
     return render(request, 'base.html', context)
 
 def detailview(request, id):
-    menu_item_list = Menu.objects.all()
+    menu_list = Menu.objects.all()
     try:
         article = Article.objects.get(id=id)
     except Article.DoesNotExist():
         raise Http404('the article you are requesting is no longer available')
     pictures = Picture.objects.filter(article_id=id)
-    comments = Comment.objects.filter(article_id=id)
+    comments = article.comment_set.all()
     categories = Category.objects.all()
-    l = Like.objects.filter(article_id=id)
-    #l_user = l.filter(user_id=user.id)
-    likes = len(l)
-    d = Dislike.objects.filter(article_id=id)
-    #d_user = d.filter(user_id=user.id)
-    dislikes = len(d)
-
+    if request.user.is_authenticated:
+        like = Like.objects.filter(article_id=id, user_id=request.user.id)
+        dislike = Dislike.objects.filter(article_id=id, user_id=request.user.id)
+    else:
+        like="nolike";
+        dislike = "nodislike";
     context = {
         'article':article,
         'pictures':pictures,
         'comments':comments,
         'categories':categories,
-        'likes':likes,
-        'dislikes':dislikes,
-        'menu_item_list':menu_item_list,
+        'like':like,
+        'dislike':dislike,
+        'menu_list':menu_list,
     }
+    
     return render(request, 'detail.html', context)
 
 def searchview(request):
-    menu_item_list = Menu.objects.all()
+    menu_list = Menu.objects.all()
     categories = Category.objects.all()
     searchtext = request.POST['text']
     searchtext = strip_tags(searchtext)
     select = request.POST['select']
     searchtext = searchtext[:20]
     warning = "wrong search. Make sure you entered more than 2 symbols, and no html tags"
-    matching = 0
+    
    
     if len(searchtext)>=3:
         if select=="articles":
             searchresult = Article.objects.filter(text__icontains=searchtext)
             res = 1
-            matching = len(searchresult)
-                    
+            
         elif select=="comments":
             searchresult = Comment.objects.filter(text__icontains=searchtext)
             res = 2
-            matching = len(searchresult)
-
+            
         elif select=="users":
             searchresult = User.objects.filter(username__icontains=searchtext)
             res = 3
-            matching = len(searchresult)
+            
     else:
         searchresult = ''
         select=warning
@@ -88,16 +86,26 @@ def searchview(request):
             'searchresult':searchresult,
             'select':select,
             'res':res,
-            'matching':matching,
             'categories':categories,
-            'menu_item_list':menu_item_list,
+            'menu_list':menu_list,
             }
     print(searchresult)
     return render(request, 'searchresult.html', context)
 
 @login_required
+def a_go_update(request, article_id):
+    article = Article.objects.get(id=article_id)
+    categories = Category.objects.all()
+    context = {
+        'article':article,
+        'categories':categories,
+    }
+    return render(request, 'a_go_update.html', context)
+
+
+@login_required
 def a_update(request, article_id):
-    menu_item_list = Menu.objects.all()
+    menu_list = Menu.objects.all()
     article = Article.objects.get(id=article_id)
     check = request.FILES.get('picture')
     if check:
@@ -112,7 +120,7 @@ def a_update(request, article_id):
     
     context = {
         'article':article,
-        'menu_item_list':menu_item_list,
+        'menu_list':menu_list,
     }
     return HttpResponseRedirect(reverse('articles:detailview', args=(article.id,)))
 
@@ -154,8 +162,7 @@ def a_create(request):
 
 @login_required
 def like(request, article_id):
-    like = request.POST['like']
-    user_id = request.POST['user_id']
+    user_id = request.user.id
     check_like = Like.objects.filter(article_id=article_id, user_id=user_id)
     check_dislike = Dislike.objects.filter(article_id=article_id, user_id=user_id)
 
@@ -172,8 +179,7 @@ def like(request, article_id):
 
 @login_required
 def dislike(request, article_id):
-    dislike = request.POST['dislike']
-    user_id = request.POST['user_id']
+    user_id = request.user.id
     check_dislike = Dislike.objects.filter(article_id=article_id, user_id=user_id)
     check_like = Like.objects.filter(article_id=article_id, user_id=user_id)
 
@@ -189,7 +195,7 @@ def dislike(request, article_id):
 
 
 def catview(request, cat_id):
-    menu_item_list = Menu.objects.all()
+    menu_list = Menu.objects.all()
     categories = Category.objects.all() 
     category = Category.objects.get(id=cat_id)
     cat_article_list = Article.objects.filter(category_id=cat_id, published=True)
@@ -198,18 +204,18 @@ def catview(request, cat_id):
         'categories':categories,
         'category':category,
         'cat_article_list':cat_article_list,
-        'menu_item_list':menu_item_list,
+        'menu_list':menu_list,
     }
     return render(request, 'category.html', context)
 
 @login_required
 def add_pic_view(request, article_id):
-    menu_item_list = Menu.objects.all()
+    menu_list = Menu.objects.all()
     article = Article.objects.get(id=article_id)
     
     context = {
         'article':article,
-        'menu_item_list':menu_item_list,
+        'menu_list':menu_list,
     }
     return render(request, 'addpicture.html', context)
 
@@ -232,15 +238,15 @@ def add_pic_view_2(request, article_id):
     p.save()
 
     return HttpResponseRedirect(reverse('articles:detailview', args=(article_id,)))
-
+    
 
 def menuitemview(request, item_id):
     categories = Category.objects.all()
-    menu_item_list = Menu.objects.all()
+    menu_list = Menu.objects.all()
     item = Menu.objects.get(id=item_id)
     context = {
         'item':item,
-        'menu_item_list':menu_item_list,
+        'menu_list':menu_list,
         'categories':categories,
     }
     return render(request, 'menu_item.html', context)

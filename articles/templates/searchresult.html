@@ -1,42 +1,148 @@
-{% extends 'base.html' %}
-{% block title %}
-search result
-{% endblock title %}
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% load staticfiles %}
 
-{% block slider %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}search result{% endblock title %}</title>
+</head>
 
-{% endblock slider %}
+<body>
 
-{% block content %}
-   <h2>Search result</h2>
-<h3>{{matching}} matching found</h3>
-   {% if res is 1 %}
-    {% for article in searchresult %}
-        <a href="{% url 'articles:detailview' article.id %}">{{article.title}}</a>
-        <p>
-            {{article.text|truncatewords:5}}
-        </p>
-    {% empty %}
-        no matches
-    {% endfor %}
+    {% block header %}
+    <div id="hooktotop"></div>
+    <a id="up_button" href="#hooktotop">up</a>
+    <div id="wrapper">
 
-   {% elif res is 2 %}
-    {% for comment in searchresult %}
-        {{comment.text}}
-    {% empty %}
-        no matches
-    {% endfor %}
-   
-   {% elif res is 3 %}
-    {% for usr in searchresult %}
-        {{usr.username}}
-    {% empty %}
-        no matches
-    {% endfor %}
+        <div id="small_screen_menu">
+            <div class="small_screen_header">
+                <div class="text_on_sm_header">You are not logged in</div>
+                <div class="login_button_wrapper">
+                    <a role="button" type="button" class="login_a" href="">Register</a>
+                    <a role="button" type="button" class="login_a" href="">Login</a>
+                </div>
+            </div>
+            <ul>
 
-    {% else %}
-        {{select}}
-    
-   {% endif %}
-  
-{% endblock content %}
+                {% for menu in menu_list %}
+                <li>
+                    <a href="">{{menu.title}}<span>&raquo;</span></a>
+                </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+        <div class="menu">
+            <a href="{% url 'articles:home' %}" class="logo">IT-Blog</a>
+            <ul>
+                <li>
+                    <a id="register" href="{% url 'accounts:register_url' %}">Register</a>
+                </li>
+                <li>
+                    <a id="login" href="{% url 'accounts:login_url' %}">Login</a>
+                </li>
+                {% for menu in menu_list %}
+                <li>
+                    <a href="">{{menu.title}}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="dummy"></div>
+            <span id="menu_toggle">&Congruent;</span>
+        </div>
+        <section class="header">
+            <div class="header_image">
+                <div class="search_block">
+                    <form action="{% url 'articles:searchview' %}" method="post">
+                        {% csrf_token %}
+                        <select class="form_input select" name="select" id="">
+                            <option value="articles">articles</option>
+                            <option value="comments">comments</option>
+                            <option value="users">users</option>
+                        </select>
+                        <input class="form_input inkut" type="text" name="text" placeholder="type to search...">
+                        <button class="form_input button" type="submit">GO</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+        
+            {% endblock header %}
+
+            {% block content %}
+<section class="content_part">
+            <div class="container-fluid block_header">
+                <h3>search result</h3>
+            </div>
+            <div class="container">
+                <div class="row">
+                    
+                    {% if res == 1 %}
+                    {% for item in searchresult %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                        <div class="well">
+                            <a href="{% url 'articles:detailview' item.id %}"><img class="thumbnail" src="{{item.thumbnail.url}}" alt="{{article.title}}"></a>
+                            <h4>{{item.title}}</h4>
+                            <p>
+                                {{item.text|truncatewords:10}}
+                            </p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="container-fluid">
+                        <h4>No results!</h4>
+                    </div>
+                    
+                    {% endfor %}
+
+                    {% elif res == 2 %}
+                    {% for comment in searchresult %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                        <div class="well">
+                            <a href="{% url 'articles:detailview' comment.article.id %}"><img class="thumbnail" src="{{comment.article.thumbnail.url}}" alt="{{comment.article.title}}"></a>
+                            <h4>{{comment.article.title}}</h4>
+                            <p>
+                                {{comment.text|truncatewords:10}}
+                            </p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="container-fluid">
+                        <h4>No results!</h4>
+                    </div>
+                    
+                    {% endfor %}
+
+                    {% elif res == 3 %}
+                    {% for user in searchresult %}
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="well">
+                            <h5>{{user.username}}</h5>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="container-fluid">
+                        <h4>No results!</h4>
+                    </div>
+                    
+                    {% endfor %}
+                    {% endif %}
+                        
+                    
+                </div>
+            </div>
+</section>
+            {% endblock content %}
+    </div>
+
+    <script type="text/javascript" src="{% static 'js/style.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+
+</html>

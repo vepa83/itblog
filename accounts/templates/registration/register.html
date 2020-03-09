@@ -12,10 +12,14 @@
 {% endblock search %}
 
 {% block content %}
+<section class="content_part">
+<div class="container">
     <form action="" method="post">
         {% csrf_token %}
         {{form.as_p}}
         <button type="submit">Register</button>
     </form>
+    </div>
+</section>
 {% endblock content %}
     

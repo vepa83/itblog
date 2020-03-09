@@ -1,140 +1,111 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}
-    {{article.title}}
-{% endblock title %}
-    
-{% block slider %}
 
-{% endblock slider %}
 {% block content %}
-
-    {% if article.author.id == user.id %}
-    <a href="{% url 'articles:add_pic_view' article.id %}">add more pictures</a>
-    {% endif %}
-
-    {% if article.author.id == user.id %}
-    <div class="art_update_wrap">
-        <!--article update form-->    
-        <form class="art_update_form" action="{% url 'articles:a_update' article.id %}" method="post" enctype="multipart/form-data">
-            <input type="submit" name="submit" value="update" /> <br>
-            {% csrf_token %} <br>
-            
-            Change image: <br>
-            <input type="file" name="picture" id=""><br>
-            Change title: <br>
-            <input type="text" name="title" value="{{article.title}}" id=""><br>
-            Change text: <br>
-            <textarea name="text" id="" cols="30" rows="10">
-                {{article.text}}
-            </textarea>
-        </form>
-        <!--article update form end-->
-    </div>
-    {% endif %}
-        
-    <strong>{{article.title}}</strong><br>
-
+<div class="container-fluid block_header">
     {% if user.is_authenticated %}
-    <!--like  form -->
-    <form action="{% url 'articles:like' article.id %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="user_id" value={{user.id}}>
-        <input type="submit" name="like" value="like"> 
-    </form>
-    <!--like form end -->
-    <strong>{{likes}}</strong>
-    {% else %}
-    <h4>You must be logged in to vote articles</h4>
-    <strong>Like</strong>
-    <strong>{{likes}}</strong>
-    {% endif %}
-    
-    {% if user.is_authenticated %}
-    <!--dislike form -->
-    <form action="{% url 'articles:dislike' article.id %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="user_id" value={{user.id}}>
-        <input type="submit" name="dislike" value="dislike">
-    </form>
-    <!--dislike form end -->
-    <strong>{{dislikes}}</strong><br>
-    {% else %}
-    <strong>Disike</strong>
-    <strong>{{dislikes}}</strong><br>
-    {% endif %}
-
-    <!--image thumbnail and url to actual image-->
-    <a href="{{article.image.url}}" target="_blank">
-        <img src="{{article.thumbnail.url}}" alt="{{article.title}}">
-    </a>
-    <!--image thumbnail and url to actual image end-->
-    <!--Picture thumbnail and url to actual pictures-->
-    {% for picture in pictures %}
-        
-    <a href="{{picture.picture.url}}" target="_blank">
-        <img src="{{picture.thumbnail.url}}" alt="{{picture.alt}}">
-    </a>
-
-    {% endfor %}
-    <!--Picture thumbnail and url to actual pictures end-->
-    <div>
-        <p>
-            {{article.text|safe}}
-        </p>
-    </div>
-
-    <div>
-        Author: <strong>{{article.author.username}}</strong><br>
-        <em>published in {{article.pub_date}}</em>
-    </div>
-    <hr>
-    <br>
-<!--Comment section end -->
-<div id="comment_section">    
-    <!--leave comment section -->
-    <div>
-        
-        {% if user.is_authenticated %}
-            <form action="{% url 'comments:leavecomment' article.id %}" method="post">
-                <h3> leave your comment here</h3>
-                {% csrf_token %}
-                <input type="hidden" name="user" value="{{user.id}}" id="">
-                <textarea name="text" required>
-            
-                </textarea><br>
-                <input type="submit" name="submit" value="OK" />
-            </form>
+        {% if user.id == article.author_id %}
+        <h3>{{article.title}}<a role="button" class="btn btn-md btn-default pull-right" href="{% url 'articles:a_go_update' article.id %}">update</a></h3>
         {% else %}
-            <h4>You must be logged in to be able to leave comments</h4>        
+        <h3>{{article.title}}</h3>
         {% endif %}
-            
         
+    {% else %}
+    <h3>{{article.title}}</h3>
+    {% endif %}
+</div>
+<div class="container">
+    {% if user.is_authenticated %}
+    {% if user.id == article.author_id %}
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-3 col-xs-2"></div>
+        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8">
+            <div class="well">
+                <form method="post" action="{% url 'articles:add_pic_view_2' article.id %}" class="form-group" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="text" name="alt" class="form-control" placeholder="short description of picture">
+                    <input type="file" name="picture" class="form-control">
+                    <button type="submit" class="btn btn-md btn-primary">add picture</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-3 col-xs-2"></div>
     </div>
-    <!--leave comment section end-->
-
-    <!-- List of comments -->
-    <div>
+    {% endif %}
+    {% endif %}
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">      
+            <img class="thumbnail" src="{{article.thumbnail.url}}">
+        </div>
         
-        {% for comment in comments %}
-            <div>
-                <p>
-                    {{comment.text}}
-                </p>
-            </div>
-
-            <div>
-                <h5>{{comment.author.username}}</h5>
-            </div>
-            <hr>
-        {% empty %}
-            <h3>No comments be a first!</h3>
+        {% for picture in pictures %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+            <img class="thumbnail" src="{{picture.thumbnail.url}}">
+        </div>
         {% endfor %}
             
     </div>
-    <!-- List of comments end-->
+    {% if user.is_authenticated %}
+    
+    {% if like %}
+    <a role="button" class="btn btn-md btn-success" href="{% url 'articles:like' article.id %}">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+    </a>
+    {% else %}
+    <a role="button" class="btn btn-md btn-default" href="{% url 'articles:like' article.id %}">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+    </a>
+    {% endif %}
+    
+    
+    {% if dislike %}
+    <a role="button" class="btn btn-md btn-danger" href="{% url 'articles:dislike' article.id %}">
+        <span class="glyphicon glyphicon-thumbs-down"></span>
+    </a>
+    {% else %}
+    <a role="button" class="btn btn-md btn-default" href="{% url 'articles:dislike' article.id %}">
+        <span class="glyphicon glyphicon-thumbs-down"></span>
+    </a>
+    {% endif %}
+    
+    
+    
+    {% else %}
+    <a role="button" class="btn btn-md btn-default" href="">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+    </a>
+    <a role="button" class="btn btn-md btn-default" href="">
+        <span class="glyphicon glyphicon-thumbs-down"></span>
+    </a>
+    {% endif %}
+    <div class="container">
+    <p>
+        {{article.text}}
+    </p>
+    <div class="block_header">
+        <h4>Comments</h4>       
+    </div>
+    
+    {% if user.is_authenticated %}
+    <form class="form-group" action="{% url 'comments:leavecomment' article.id %}" method="post">
+        {% csrf_token %}
+        <textarea class="form-control" name="text" placeholder="type your comment here"></textarea>
+        <button type="submit" class="btn btn-md btn-primary">add comment</button>
+    </form>
+    {% endif %}
+        
+    
+
+    {% for comment in comments %}
+    <div class="well">
+        <strong>{{comment.author.username}}</strong>
+        <p>{{comment.text}}</p>
+    </div>
+    {% endfor %}
+    </div>
 </div>
-<!--Comment section end -->
+    
 {% endblock content %}
     

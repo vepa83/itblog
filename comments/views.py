@@ -12,12 +12,12 @@ User = get_user_model()
 
 @login_required
 def leavecomment(request, article_id):
-    user = User.objects.get(id=request.POST['user'])
+    user = request.user
     try:
         article = Article.objects.get(id=article_id)
     except Article.DoesNotExist():
         raise Http404('the article you are requesting is no longer available')
-    article.comment_set.create(author=user, text=strip_tags(request.POST['text']))
+    article.comment_set.create(author_id=user.id, text=strip_tags(request.POST['text']))
     return HttpResponseRedirect(reverse('articles:detailview', args=(article.id,)))
 
 @login_required

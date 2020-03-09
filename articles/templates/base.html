@@ -1,43 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    {% load staticfiles %}
     {% load static %}
+    {% load staticfiles %}
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <title>
-        {% block title %}
-        Home page
-        {% endblock title %}
-    </title>
+    <link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}Home page{% endblock title %}</title>
 </head>
-<body>
-{% include 'menu.html' %}
-{% block slider %}
-{% include 'slider.html' %}
-{% endblock slider %}
-<div class="jumbotron">
-
-
-
-
-{% include 'user_info.html' %}
-{% block search %}
-{% include 'search.html' %}
-{% endblock search %}
+<body>  
+    
+    {% block header %}       
+    <div id="hooktotop"></div>
+    <a id="up_button" href="#hooktotop">up</a>
+    <div id="wrapper">
+    
+    <div id="small_screen_menu">
+        <div class="small_screen_header">
+            
+            {% if user.is_authenticated %}
+            <div class="text_on_sm_header">Welcome {{user.username}} !</div>
+            <div class="login_button_wrapper">
+                <a role="button" type="button" class="login_a" href="{% url 'accounts:profile' %}">Profile</a>
+                <a role="button" type="button" class="login_a" href="{% url 'accounts:logout' %}">Logout</a>
+            </div>
+            {% else %}
+            <div class="text_on_sm_header">You are not logged in</div>
+            <div class="login_button_wrapper">
+                <a role="button" type="button" class="login_a" href="{% url 'accounts:register_url' %}">Register</a>
+                <a role="button" type="button" class="login_a" href="{% url 'accounts:login_url' %}">Login</a>
+            </div>
+            {% endif %}
+                
+            
+        </div>
+        <ul>
+            
+        {% for menu in menu_list %}
+            <li>
+                <a href="{% url 'articles:catview' menu.category.id %}">{{menu.category.name}}<span>&raquo;</span></a>
+            </li>
+        {% endfor %}
+        
+        </ul>
+    </div>
+    <div class="menu">
+        <a href="{% url 'articles:home' %}" class="logo">IT-Blog</a>
+        <ul>
+            
+            {% if user.is_authenticated %}
+            <li>
+                <a id="register" href="{% url 'accounts:profile' %}">Profile</a>
+            </li>
+            <li>
+                <a id="login" href="{% url 'accounts:logout' %}">Logout</a>
+            </li>
+            {% else %}
+            <li>
+                <a id="register" href="{% url 'accounts:register_url' %}">Register</a>
+            </li>
+            <li>
+                <a id="login" href="{% url 'accounts:login_url' %}">Login</a>
+            </li>
+            {% endif %}
+                
+            
+            {% for menu in menu_list %}
+            <li>
+                <a href="{% url 'articles:catview' menu.category.id %}">{{menu.category.name}}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="dummy"></div>
+        <span id    ="menu_toggle">&Congruent;</span>
+    </div>
+    <section class="header">
+        <div class="header_image">
+            <div class="search_block">
+                <form action="{% url 'articles:searchview' %}" method="post">
+                    {% csrf_token %}
+                    <select class="form_input select" name="select" id="">
+                        <option value="articles">articles</option>
+                        <option value="comments">comments</option>
+                        <option value="users">users</option>
+                    </select>
+                    <input class="form_input inkut" type="text" name="text" placeholder="type to search...">
+                    <button class="form_input button" type="submit">GO</button>
+                </form>
+            </div>        
+        </div>
+    </section>
+    
+{% endblock header %}
 
 
 {% block content %}
-{% include 'latest.html' %}
+<section class="content_part">
+<div class="container-fluid block_header">
+        <h3>Latest articles</h3>
+    </div>
+<div class="container-fluid">
+<div class="row">
+    {% for article in articles %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+            <div class="well">
+               <a href="{% url 'articles:detailview' article.id %}"><img class="thumbnail" src="{{article.thumbnail.url}}" alt="{{article.title}}"></a>
+                <h4>{{article.title}}</h4>
+                <p>
+                    {{article.text|truncatewords:4}}
+                </p>
+            </div>
+        </div>
+        
+    {% endfor %}
+</div>
+</div>
+</section>
 {% endblock content %}
 
+    <section class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-3 col-xs-3"></div>
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 footer_text">
+                    &copy; All rights reserved <br>
+                    since 2019 <br>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-3 col-xs-3"></div>
+            </div>
+        </div>
+        
+    </section>
 </div>
-{% include 'footer.html' %}
+    
+<script type="text/javascript" src="{% static 'js/style.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
 </body>
 </html>
-    

@@ -1,22 +1,32 @@
 {% extends 'base.html' %}
 
-{% block slider %}
-    
-{% endblock slider %}
 
-{% block search %}
-    
-{% endblock search %}
-    
-    
+{% block title %}
+    add picture
+{% endblock title %}
+
+
+
 {% block content %}
-    <form action="{% url 'articles:add_pic_view_2' article.id %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        alt:<br>
-        <input type="text" name="alt"><br>
-        picture:<br>
-        <input type="file" name="picture"><br>
-        <input type="submit" value="add">
-    </form>
+    <section class="content_part">
+        <div class="container-fluid block_header">
+            <h3>Adding pictures</h3>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-3 col-xs-2"></div>
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8">
+                    <div class="well">
+                        <form action="{% url 'articles:add_pic_view_2' article.id %}" class="form-group" enctype="multipart/form-data">
+                            <input type="file" name="picture">
+                            <button type="submit" class="btn btn-md btn-primary">add</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-3 col-xs-2"></div>
+            </div>
+        </div>
+    </section>
+
 {% endblock content %}
+    

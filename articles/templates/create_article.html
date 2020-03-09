@@ -1,23 +1,42 @@
 {% extends 'base.html' %}
 
 
+{% block title %}
+    new article
+{% endblock title %}
+
 {% block content %}
-    <form action="{% url 'articles:a_create' %}" method="post" enctype="multipart/form-data">
-        <h3> Create article</h3>
-        select category: <br>
-        <select name="select" id="">
-            {% for category in categories %}
-                <option value="{{category.id}}">{{category.name}}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" name="submit" value="create" /> <br>
-        {% csrf_token %} <br>
-        <input type="hidden" name="usr" value="{{user.id}}" id=""><br>
-        title: <br>
-        <input type="text" name="title" value="" id="" required><br>
-        image: <br>
-        <input type="file" name="image" value="" id=""><br>
-        text: <br>
-        <textarea name="text" id="" cols="30" rows="10" required></textarea>
-    </form>
+<section class="content_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-2 col-xs-1"></div>
+            <div class="col-lg-6 col-md-6 col-sm-8 col-xs-10">
+                <div class="block_header">
+                    <h3>Create an article</h3>
+                </div>
+                
+                <form class="form-group" action="{% url 'articles:a_create' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" class="form-control fc" name="image" value="{{user.id}}">
+                    <input type="text" class="form-control fc" name="title" placeholder="title...">
+                    <input type="hidden" class="form-control fc" name="usr" value="{{user.id}}">
+                    <select name="select" id="" class="form-control fc">
+                        
+                        {% for option in categories %}
+                        <option value="{{option.id}}">{{option.name}}</option>
+                        {% endfor %}
+                            
+                        
+                    </select>
+                    <textarea name="text" class="form-control fc" placeholder="text..."></textarea>
+                    <button type="submit" class="btn btn-md btn-primary">create</button>
+                </form>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-2 col-xs-1"></div>
+        </div>
+
+    </div>
+</section>
+    
 {% endblock content %}
+    

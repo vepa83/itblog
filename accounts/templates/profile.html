@@ -4,50 +4,49 @@
 {% block title %}
     {{user.username}}
 {% endblock title %}
-{% block slider %}
-
-{% endblock slider %}
-
-{% block search %}
-
-{% endblock search %}
-
 
 {% block content %}
-    <br>
-    <a href="{% url 'articles:create_article' %}">create new article</a>
-    <h2>Your article list</h2>
-    
+<section class="content_part">
+    <div class="container">    
+    <a role="button" class="btn btn-md btn-warning" href="{% url 'articles:create_article' %}">create new article</a>
+    <div class="block_header">
+        <h3>My article list</h3>
+    </div>
+    <div class="row">
     {% for article in articles %}
-        
-        {% if article.author_id == user.id %}
+    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+        <div class="well">
             
             {% if article.published %}
-                published 
+                <span class="label label-success">published</span><br> 
             {% else %}
-                pending
+                <span class="label label-warning">pending</span><br>
             {% endif %}
-            <a href="{% url 'articles:detailview'  article.id %}"><strong>{{article.title}}</strong></a>
-            <a href="{% url 'articles:a_delete' article.id %}">delete</a><br>
+            <br>
+            <a href="{% url 'articles:detailview'  article.id %}"><img class="thumbnail" src="{{article.thumbnail.url}}"></a>
+            <a role="button" class="btn btn-md btn-danger" href="{% url 'articles:a_delete' article.id %}">delete</a><br>
+            <br>
+            <strong>{{article.title}}</strong><br>
+            
             <p>
                 {{article.text|truncatewords:4}}
             </p>
             <em>{{article.pub_date}}</em><br>
-        {% endif %}
-    
+        </div>
+    </div>
     {% endfor %}
-   
-    <h2>Your comment list</h2>
-
-    {% for comment in comments %}
-    
-        {% if comment.author_id == user.id %}
-            <a href="{% url 'articles:detailview' comment.article.id %}"><strong>{{comment.text|safe}}</strong></a>
-            <a href="{% url 'comments:deletecomment' comment.id %}">delete</a><br>
-            <em>{{comment.pub_date}}</em><br>
-        {% endif %}
-            
+    </div>
+<div class="block_header">   
+    <h3>My comment list</h3>
+</div>
+    {% for comment in comments %}    
+    <div class="well">
+    <a href="{% url 'articles:detailview' comment.article.id %}"><strong>{{comment.text|truncatewords:5}}</strong></a><br>
+    <em>{{comment.pub_date}}</em><br>
+    <a role="button" class="btn btn-md btn-danger" href="{% url 'comments:deletecomment' comment.id %}">delete</a><br>
+    </div>
     {% endfor %}
-   
+</div>
+</section>
 {% endblock content %}
     

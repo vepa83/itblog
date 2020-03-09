@@ -1,9 +1,9 @@
 from django.db import models
-
+from articles.models import Category
 
 class Menu(models.Model):
     title = models.CharField(max_length=50)
-    is_category = models.BooleanField(default=False)
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
 
    
     def __str__(self):
